@@ -1,0 +1,71 @@
+################################################################################
+#
+# This workflow setst the following secrets:
+#  - GCP_KEY: ServiceAccount key for the Google Cloud Translator
+#  - TWITTER_BEARERTOKEN: Bearer Token for the use with Twitter API
+#
+description: This workflows sets up the demo for the Python masterclass
+
+functions:
+- id: get-request
+  image: direktiv/request:latest
+  type: knative-workflow
+
+states:
+# make sure all the inputs are set
+- id: validate-input
+  type: validate
+  schema:
+    title: Setup workflow environment
+    type: object
+    required: ["gcpkey", "bearertoken","direktivnamespace","direktivtoken","direktivurl"]
+    properties:
+      gcpkey:
+        title: GCP Key
+        type: string
+      bearertoken:
+        title: Twitter Bearer Token
+        type: string
+      direktivtoken:
+        title: Direktiv Auth Token
+        type: string
+      direktivnamespace:
+        title: Direktiv Namespace
+        type: string
+      direktivurl:
+        title: Direktiv URL
+        type: string
+        default: "https://demo.direktiv.io"
+  transition: create-secret-gcp
+
+- id: create-secret-gcp
+  type: action
+  action:
+    function: get-request
+    input: 
+      method: "PUT"
+      url: 'jq(.direktivurl)/api/namespaces/jq(.direktivnamespace)/secrets/GCP_KEY'
+      headers:
+        "direktiv-token": jq(.direktivtoken)
+      body: jq(.gcpkey)
+  catch:
+    - error: "*"
+  transition: create-secret-twitter
+
+- id: create-secret-twitter
+  type: action
+  action:
+    function: get-request
+    input: 
+      method: "PUT"
+      url: 'jq(.direktivurl)/api/namespaces/jq(.direktivnamespace)/secrets/TWITTER_BEARERTOKEN'
+      headers:
+        "direktiv-token": jq(.direktivtoken)
+      body: jq(.bearertoken)
+  catch:
+    - error: "*"
+  transition: logall
+
+- id: logall
+  type: noop
+  log: jq(.)

@@ -1,0 +1,67 @@
+################################################################################
+#
+# This workflow needs the following secrets to be set
+#  - GCP_KEY: ServiceAccount key for the Google Cloud Translator
+#  - TWITTER_BEARERTOKEN: Bearer Token for the use with Twitter API
+#
+# This workflow needs the following inputs
+#  - searchstring: the search string to be used to scan Twitter
+#  - projectid: Project ID for Google Cloud
+#  - location: Location for Google Cloud Translator access
+#
+description: A simple workflow that runs a container called py-tweets-lang from hub.docker.com
+
+functions:
+- id: py-tweets-lang
+  image: wwonigkeit/py-tweets-lang:latest
+  type: knative-workflow
+
+states:
+# make sure all the inputs are set
+- id: validate-input
+  type: validate
+  schema:
+    title: Check Twitter Language Types
+    type: object
+    required: ["projectid", "location", "searchstring","maxsearchreturns","outputfile"]
+    properties:
+      projectid:
+        title: GCP Project ID
+        type: string
+        default: "direktiv"
+      location:
+        title: GCP Location
+        type: string
+        default: "global"
+      searchstring:
+        title: Twitter Search String
+        type: string
+        default: "direktiv"
+      maxsearchreturns:
+        title: Maximum Search Results
+        type: integer
+        default: 10
+      outputfile:
+        title: Output file location
+        type: string
+        default: "/tmp/output.json"        
+  transition: run-container
+
+- id: run-container 
+  type: action
+  action:
+    function: py-tweets-lang
+    secrets: ["GCP_KEY", "TWITTER_BEARERTOKEN"]
+    input: 
+      bearertoken: jq(.secrets.TWITTER_BEARERTOKEN)
+      projectid: jq(.projectid)
+      location: jq(.location)
+      searchstring: jq(.searchstring)
+      maxsearchreturns: jq(.maxsearchreturns)
+      outputfile: jq(.outputfile)
+      gcpkey: jq(.secrets.GCP_KEY | fromjson)
+  transition: logall
+
+- id: logall
+  type: noop
+  log: jq(.return)

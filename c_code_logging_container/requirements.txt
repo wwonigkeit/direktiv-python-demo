@@ -1,0 +1,4 @@
+tweepy
+google-cloud-translate
+google-auth
+requests
