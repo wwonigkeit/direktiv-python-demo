@@ -78,7 +78,7 @@ states:
       outputfile: jq(.outputfile)
       gcpkey: jq(.secrets.GCP_KEY | fromjson)
       tweets: jq(.return.tweets)
-  transition: logall
+  transition: log-lang
 
 - id: log-lang
   type: noop
