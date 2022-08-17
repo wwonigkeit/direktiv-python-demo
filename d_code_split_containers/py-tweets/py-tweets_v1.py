@@ -106,7 +106,7 @@ class DirektivHandler(BaseHTTPRequestHandler):
 
             return
         else:
-            return self._send_error("com.tweetslang.error","json field 'searchstring', 'bearertoken', 'projectid', 'location' and'gcpkey' must be set")
+            return self._send_error("com.tweetslang.error","json field 'searchstring', 'bearertoken', 'maxsearchreturns' and 'outputfile' must be set")
 
 httpd = HTTPServer(('', PORT), DirektivHandler)
 print('Starting twitter get server on ":%s"' % PORT)
