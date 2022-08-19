@@ -73,6 +73,7 @@ states:
       - command: pip3 install google-cloud-translate==3.8.1 
       - command: pip3 install google-auth
       - command: python3 py-tweets-lang.py -i input.json -o jq(.outputfile)
+      - command: cat jq(.outputfile)
     files:
     - key: py-tweets-lang.py
       scope: workflow
