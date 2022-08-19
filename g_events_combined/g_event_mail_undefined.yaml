@@ -34,3 +34,20 @@ states:
 - id: email-undefined
   log: jq(.)
   type: noop
+  transition: send-email
+
+# Send an unencrypted email message with the attachments.
+- id: send-email
+  type: action
+  action:
+    secrets: ["EMAIL_USER", "EMAIL_PASSWORD"]
+    function: send-email
+    input:
+      address: "smtp.gmail.com"
+      port: 587
+      tls: true
+      from: jq(.secrets.EMAIL_USER)
+      password: jq(.secrets.EMAIL_PASSWORD)
+      to: "wilhelm.wonigkeit@direktiv.io"
+      subject: Undefined email Tweets
+      body: jq(.)

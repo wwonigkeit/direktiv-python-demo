@@ -29,8 +29,33 @@ start:
     context:
       lang: "english"
 
+#
+# Functions for email
+#
+functions:
+  - id: send-email
+    image: direktiv/smtp-bare:latest
+    type: knative-workflow
+
 states:
 #
 - id: email-english
   log: jq(.)
   type: noop
+  transition: send-email
+
+# Send an unencrypted email message with the attachments.
+- id: send-email
+  type: action
+  action:
+    secrets: ["EMAIL_USER", "EMAIL_PASSWORD"]
+    function: send-email
+    input:
+      address: "smtp.gmail.com"
+      port: 587
+      tls: true
+      from: jq(.secrets.EMAIL_USER)
+      password: jq(.secrets.EMAIL_PASSWORD)
+      to: "wilhelm.wonigkeit@direktiv.io"
+      subject: English email Tweets
+      body: jq(.)

@@ -64,6 +64,34 @@ states:
       body: jq(.bearertoken)
   catch:
     - error: "*"
+  transition: create-email-user
+
+- id: create-email-user
+  type: action
+  action:
+    function: get-request
+    input: 
+      method: "PUT"
+      url: 'jq(.direktivurl)/api/namespaces/jq(.direktivnamespace)/secrets/EMAIL_USER'
+      headers:
+        "direktiv-token": jq(.direktivtoken)
+      body: jq(.bearertoken)
+  catch:
+    - error: "*"
+  transition: create-email-password
+
+- id: create-email-password
+  type: action
+  action:
+    function: get-request
+    input: 
+      method: "PUT"
+      url: 'jq(.direktivurl)/api/namespaces/jq(.direktivnamespace)/secrets/EMAIL_PASSWORD'
+      headers:
+        "direktiv-token": jq(.direktivtoken)
+      body: jq(.bearertoken)
+  catch:
+    - error: "*"
   transition: logall
 
 - id: logall
