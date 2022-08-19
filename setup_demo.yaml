@@ -48,6 +48,7 @@ states:
       headers:
         "direktiv-token": jq(.direktivtoken)
       body: jq(.gcpkey)
+      insecureSkipVerify: true
   catch:
     - error: "*"
   transition: create-secret-twitter
@@ -62,6 +63,7 @@ states:
       headers:
         "direktiv-token": jq(.direktivtoken)
       body: jq(.bearertoken)
+      insecureSkipVerify: true
   catch:
     - error: "*"
   transition: create-email-user
@@ -76,6 +78,7 @@ states:
       headers:
         "direktiv-token": jq(.direktivtoken)
       body: jq(.bearertoken)
+      insecureSkipVerify: true
   catch:
     - error: "*"
   transition: create-email-password
@@ -90,6 +93,7 @@ states:
       headers:
         "direktiv-token": jq(.direktivtoken)
       body: jq(.bearertoken)
+      insecureSkipVerify: true
   catch:
     - error: "*"
   transition: logall
