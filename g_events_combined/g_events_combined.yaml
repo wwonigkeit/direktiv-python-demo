@@ -79,7 +79,63 @@ states:
       gcpkey: jq(.secrets.GCP_KEY | fromjson)
       tweets: jq(.return.tweets)
   transition: log-lang
+  transform: 'jq({ results: .return })'
 
 - id: log-lang
   type: noop
-  log: jq(.return)
+  log: jq(.)
+  transition: select-en
+  
+- id: select-en
+  type: switch
+  defaultTransition: catch-all-lang
+  conditions:
+  - condition: 'jq([.results[] | select(.[] | .=="en")] | . == 0)'
+    transform: 'jq( {english: [ .results[] | select(.[] | .=="en")]} )'
+    transition: english
+  - condition: 'jq([.results[] | select(.[] | .=="da")] | . == 0)'
+    transform: 'jq( {danish: [ .results[] | select(.[] | .=="da")]} )'
+    transition: danish
+  - condition: 'jq([.results[] | select(.[] | .=="sv")] | . == 0)'
+    transform: 'jq( {swedish: [ .results[] | select(.[] | .=="sv")]} )'
+    transition: swedish
+
+- id: catch-all-lang
+  type: generateEvent
+  event:
+    type: com.direktiv.twitterlang.result
+    source: /g_events_combined/g_events_combined_workflow
+    data: 'jq(.)'
+    datacontenttype: application/json
+    context:
+      lang: undefined
+
+- id: english
+  type: generateEvent
+  event:
+    type: com.direktiv.twitterlang.result
+    source: /g_events_combined/g_events_combined_workflow
+    data: 'jq(.)'
+    datacontenttype: application/json
+    context:
+      lang: english
+
+- id: danish
+  type: generateEvent
+  event:
+    type: com.direktiv.twitterlang.result
+    source: /g_events_combined/g_events_combined_workflow
+    data: 'jq(.)'
+    datacontenttype: application/json
+    context:
+      lang: danish
+
+- id: swedish
+  type: generateEvent
+  event:
+    type: com.direktiv.twitterlang.result
+    source: /g_events_combined/g_events_combined_workflow
+    data: 'jq(.)'
+    datacontenttype: application/json
+    context:
+      lang: swedish
