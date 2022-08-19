@@ -1,0 +1,36 @@
+# Event Input:
+# {
+#   "com.direktiv.twitterlang.result": {
+#     "data": {
+#       <tweets
+#     },
+#     "datacontenttype": "application/json",
+#     "endpoint": "linux",
+#     "id": "8850c81e-1db4-4ecd-8734-dbb86380536a",
+#     "ipaddress": "3.26.24.101",
+#     "source": "/g_events_combined/g_events_combined_workflow",
+#     "specversion": "1.0",
+#     "type": "com.direktiv.twitterlang.result",
+#     "lang": "english" | "swedish" | "danish"
+#   }
+# }
+#
+description: Event email based on the language (english)
+
+#
+# The start definition which starts the worklfow based on the event received from the
+# previous workflow. Example of the event is shown above in the description
+#
+start:
+  type: event
+  state: email-english
+  event: 
+    type: com.direktiv.twitterlang.result
+    context:
+      lang: "english"
+
+states:
+#
+- id: email-english
+  log: jq(.)
+  type: noop
