@@ -90,13 +90,13 @@ states:
   type: switch
   defaultTransition: catch-all-lang
   conditions:
-  - condition: 'jq([.results[] | select(.[] | .=="en")] | . == 0)'
+  - condition: 'jq([.results[] | select(.[] | .=="en")] | length > 0)'
     transform: 'jq( {english: [ .results[] | select(.[] | .=="en")]} )'
     transition: english
-  - condition: 'jq([.results[] | select(.[] | .=="da")] | . == 0)'
+  - condition: 'jq([.results[] | select(.[] | .=="da")] | length > 0)'
     transform: 'jq( {danish: [ .results[] | select(.[] | .=="da")]} )'
     transition: danish
-  - condition: 'jq([.results[] | select(.[] | .=="sv")] | . == 0)'
+  - condition: 'jq([.results[] | select(.[] | .=="sv")] | length > 0)'
     transform: 'jq( {swedish: [ .results[] | select(.[] | .=="sv")]} )'
     transition: swedish
 
