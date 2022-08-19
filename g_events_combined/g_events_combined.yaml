@@ -1,0 +1,85 @@
+################################################################################
+#
+# This workflow needs the following secrets to be set
+#  - GCP_KEY: ServiceAccount key for the Google Cloud Translator
+#  - TWITTER_BEARERTOKEN: Bearer Token for the use with Twitter API
+#
+# This workflow needs the following inputs
+#  - searchstring: the search string to be used to scan Twitter
+#  - projectid: Project ID for Google Cloud
+#  - location: Location for Google Cloud Translator access
+#
+description: A simple workflow that runs a container called py-tweets-lang from hub.docker.com
+
+functions:
+- id: py-tweets
+  image: wwonigkeit/py-tweets:latest
+  type: knative-workflow
+- id: py-lang
+  image: wwonigkeit/py-lang:latest
+  type: knative-workflow
+
+states:
+# make sure all the inputs are set
+- id: validate-input
+  type: validate
+  schema:
+    title: Check Twitter Language Types
+    type: object
+    required: ["projectid", "location", "searchstring","maxsearchreturns","outputfile"]
+    properties:
+      projectid:
+        title: GCP Project ID
+        type: string
+        default: "direktiv"
+      location:
+        title: GCP Location
+        type: string
+        default: "global"
+      searchstring:
+        title: Twitter Search String
+        type: string
+        default: "direktiv"
+      maxsearchreturns:
+        title: Maximum Search Results
+        type: integer
+        default: 10
+      outputfile:
+        title: Output file location
+        type: string
+        default: "/tmp/output.json"        
+  transition: get-tweets
+
+- id: get-tweets
+  type: action
+  action:
+    function: py-tweets
+    secrets: ["TWITTER_BEARERTOKEN"]
+    input: 
+      bearertoken: jq(.secrets.TWITTER_BEARERTOKEN)
+      searchstring: jq(.searchstring)
+      maxsearchreturns: jq(.maxsearchreturns)
+      outputfile: jq(.outputfile)
+  transition: log-tweets
+
+- id: log-tweets
+  type: noop
+  log: jq(.)
+  transition: get-lang
+
+- id: get-lang
+  type: action
+  action:
+    function: py-lang
+    secrets: ["GCP_KEY"]
+    input: 
+      projectid: jq(.projectid)
+      location: jq(.location)
+      outputfile: jq(.outputfile)
+      gcpkey: jq(.secrets.GCP_KEY | fromjson)
+      tweets: jq(.return.tweets)
+  transition: log-lang
+
+- id: log-lang
+  type: noop
+  log: jq(.return)
