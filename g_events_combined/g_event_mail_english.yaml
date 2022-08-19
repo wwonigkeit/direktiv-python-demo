@@ -57,5 +57,5 @@ states:
       from: jq(.secrets.EMAIL_USER)
       password: jq(.secrets.EMAIL_PASSWORD)
       to: "wilhelm.wonigkeit@direktiv.io"
-      subject: English email Tweets
-      body: jq(.)
+      subject: "English email Tweets"
+      body: jq(."com.direktiv.twitterlang.result".data.results)
