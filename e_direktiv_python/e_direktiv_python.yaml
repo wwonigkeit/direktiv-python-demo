@@ -78,8 +78,8 @@ states:
     - key: py-tweets-lang.py
       scope: workflow
   transition: logall
-  #transform:
-  #  tweets: jq(.return.python[6])
+  transform:
+    tweets: jq(.return.python[7])
 
 - id: logall
   type: noop
