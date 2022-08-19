@@ -57,29 +57,29 @@ states:
       - name: input.json
         data: |
           {  
-            "bearertoken": "jq(.secrets.TWITTER_BEARERTOKEN)",
-            "projectid": "jq(.projectid)",
-            "location": "jq(.location)",
-            "searchstring": "jq(.searchstring)",
-            "maxsearchreturns": "jq(.maxsearchreturns)",
+            "bearer_token": "jq(.secrets.TWITTER_BEARERTOKEN)",
+            "gcp_projectid": "jq(.projectid)",
+            "gcp_location": "jq(.location)",
+            "twitter_searchstring": "jq(.searchstring)",
+            "max_search_returns": "jq(.maxsearchreturns)",
             "outputfile": "jq(.outputfile)",
-            "gcpkey": "jq(.secrets.GCP_KEY | fromjson)"
+            "gcp_key": jq(.secrets.GCP_KEY | fromjson)
           }
       commands:
       - command: pyenv local 3.8.13
-      #- command: pip3 install tweepy
-      - command: apt-get update 
-      - command: apt-get install clang -y
-      - command: pip install grpcio
-      - command: pip install google-cloud-translate
-      #- command: pip3 install google-auth
-      #- command: python3 py-tweets-lang_v1.py -i input.json -o output.json
-      # - command: ls -la
+      - command: pip3 install tweepy
+      - command: pip3 install grpcio==1.48.0
+      - command: pip3 install googleapis-common-protos==1.56.3 
+      - command: pip3 install google-cloud-translate==3.8.1 
+      - command: pip3 install google-auth
+      - command: python3 py-tweets-lang.py -i input.json -o jq(.outputfile)
     files:
     - key: py-tweets-lang.py
       scope: workflow
-  transition: logall
+  # transition: logall
+  # transform:
+  #   tweets: jq(.return.python[6])
 
-- id: logall
-  type: noop
-  log: jq(.return)
+# - id: logall
+#   type: noop
+#   log: jq(.return)
