@@ -29,6 +29,14 @@ start:
     context:
       lang: "undefined"
 
+#
+# Functions for email
+#
+functions:
+  - id: send-email
+    image: direktiv/smtp-bare:latest
+    type: knative-workflow
+
 states:
 #
 - id: email-undefined
