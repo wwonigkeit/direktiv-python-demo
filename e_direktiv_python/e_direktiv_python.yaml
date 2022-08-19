@@ -11,6 +11,10 @@
 #
 description: A simple workflow that runs a container called py-tweets-lang from hub.docker.com
 
+start:
+  type: scheduled
+  cron: '*/5 * * * *' # Trigger a new instance every minute.
+
 functions:
 - id: python
   image: gcr.io/direktiv/apps/python:1.0
