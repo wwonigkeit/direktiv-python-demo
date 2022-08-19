@@ -76,10 +76,10 @@ states:
     files:
     - key: py-tweets-lang.py
       scope: workflow
-  # transition: logall
-  # transform:
-  #   tweets: jq(.return.python[6])
+  transition: logall
+  transform:
+    tweets: jq(.return.python[6])
 
-# - id: logall
-#   type: noop
-#   log: jq(.return)
+- id: logall
+  type: noop
+  log: jq(.)
