@@ -116,5 +116,5 @@ def shutdown(*args):
     httpd.server_close()
     sys.exit(0)
 
-signal.signal(signal.SIGINT, shutdown)
+signal.signal(signal.SIGTERM, shutdown)
 httpd.serve_forever()
